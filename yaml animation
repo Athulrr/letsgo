@@ -1,0 +1,33 @@
+name: learning
+description: A new Flutter project.
+
+publish_to: 'none' # Remove this line if you want to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  video_player: ^2.5.0
+  google_maps_flutter: ^2.2.3 # Use the latest stable version
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/2.jpg" # Make sure the image exists at this location
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/1.png  # Existing image for background
+    - assets/animation.mp4 # Add the mp4 video for the splash screen
