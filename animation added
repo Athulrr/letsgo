@@ -1,0 +1,261 @@
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:video_player/video_player.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Tourism App',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+      ),
+      home: SplashScreen(),
+    );
+  }
+}
+
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the video player controller with the asset mp4
+    _controller = VideoPlayerController.asset('assets/animation.mp4')
+      ..initialize().then((_) {
+        setState(() {
+          _controller.play(); // Start the video
+        });
+      });
+
+    // Navigate to the HomePage after the video ends
+    _controller.addListener(() {
+      if (_controller.value.position == _controller.value.duration) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // Get the current screen size
+          var screenWidth = constraints.maxWidth;
+          var screenHeight = constraints.maxHeight;
+
+          // Scale the video size dynamically based on screen size
+          return Center(
+            child: _controller.value.isInitialized
+                ? AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: Container(
+                      width: screenWidth * 0.9, // Adjust width to 90% of screen
+                      height: screenHeight * 0.9, // Adjust height to 90% of screen
+                      child: VideoPlayer(_controller),
+                    ),
+                  )
+                : CircularProgressIndicator(), // Show a loader while the video is loading
+          );
+        },
+      ),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Background Image
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/1.png'), // Background image
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          // Bottom Navigation Buttons
+          Positioned(
+            bottom: 30,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.home, color: Colors.white),
+                  onPressed: () {
+                    // Home button action
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.map, color: Colors.white),
+                  onPressed: () {
+                    // Navigate to MapPage
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MapPage()),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.add_circle_outline, color: Colors.white),
+                  onPressed: () {
+                    // Add button action
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.info_outline, color: Colors.white),
+                  onPressed: () {
+                    // Navigate to InfoPage
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => InfoPage()),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class MapPage extends StatefulWidget {
+  @override
+  _MapPageState createState() => _MapPageState();
+}
+
+class _MapPageState extends State<MapPage> {
+  GoogleMapController? _mapController;
+
+  // Initialize the map controller
+  void _onMapCreated(GoogleMapController controller) {
+    _mapController = controller;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Map Page'),
+        backgroundColor: const Color.fromARGB(232, 5, 121, 90),
+      ),
+      body: GoogleMap(
+        onMapCreated: _onMapCreated,
+        initialCameraPosition: CameraPosition(
+          target: LatLng(10.8505, 76.2711), // Coordinates for Kerala
+          zoom: 8, // Adjust zoom level as needed
+        ),
+        myLocationEnabled: true, // Enable location button if needed
+        myLocationButtonEnabled: true, // Show location button if needed
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _mapController?.dispose(); // Clean up the map controller
+    super.dispose();
+  }
+}
+
+class InfoPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(232, 5, 121, 90),
+      appBar: AppBar(
+        title: Text('Info Page'),
+        backgroundColor: const Color.fromARGB(232, 5, 121, 90),
+      ),
+      body: Stack(
+        children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center, // Centers the text vertically
+              children: [
+                Text(
+                  'Hey folks, wanna know about "Lets Go"? It is the final year project of Team OGS, and the creators are Nourin, Noushiya, Adarsh, and Athul.',
+                  textAlign: TextAlign.center, // Centers the text horizontally
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontFamily: 'Courier',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Bottom Navigation Buttons
+          Positioned(
+            bottom: 20,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.home, color: Colors.white),
+                  onPressed: () {
+                    // Navigate back to HomePage
+                    Navigator.pop(context);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.map, color: Colors.white),
+                  onPressed: () {
+                    // Navigate to MapPage
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MapPage()),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.add_circle_outline, color: Colors.white),
+                  onPressed: () {
+                    // Add button action
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.info_outline, color: Colors.white),
+                  onPressed: () {
+                    // Stay on InfoPage
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
